@@ -51,14 +51,16 @@ The project is structured into several core Python scripts. While the exact user
 A typical workflow might involve running `main.py` with a target URL. Refer to the comments within the scripts for more specific details on their functions and parameters.
 
 ## Project Structure
+
 Collecty/
 ├── pycache/ # Compiled Python files (ignored by Git)
 ├── chromedriver.exe # Chrome WebDriver executable
-├── main.py # Main application script
+├── main.py # Main application script (Streamlit entry point)
 ├── parse.py # HTML parsing and schema discovery logic
-├── scrape.py # Web scraping logic
+├── scrape.py # Web scraping logic (Selenium + BeautifulSoup)
 ├── requirements.txt # Project dependencies
 └── README.md # This file
+
 
 ## Contributing
 
