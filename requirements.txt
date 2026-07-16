@@ -1,8 +1,7 @@
-streamlit 
-langchain
-langchain_ollama
-selenium
+streamlit
+pandas
+langchain-groq
+selenium>=4.20
 beautifulsoup4
-lxml 
-html5lib
+lxml
 python-dotenv

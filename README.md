@@ -6,10 +6,14 @@ An Intelligent, Agentic Web Scraping Framework for Automated Schema Discovery an
 
 Collecty is a Python-based framework designed to intelligently scrape websites. Its core innovation lies in its "agentic" approach, meaning it can autonomously discover and analyze the structure of the data it encounters, rather than just extracting based on pre-defined, static rules. This makes it particularly powerful for projects requiring automated schema discovery from web pages.
 
+Collecty is a Streamlit app: enter a URL, and it scrapes the site, suggests relevant data columns using an LLM, and extracts a clean, structured table you can download as CSV.
+
 ## Key Features
 
-*   **Intelligent Scraping:** Leverages logic to navigate and extract data from complex web structures.
-*   **Automated Schema Discovery:** Automatically identifies and maps the underlying data schema of web content.
+*   **Multi-Page Scraping:** Automatically follows "next page" links (pagination) to scrape up to 10 pages of a site in one run.
+*   **Intelligent Scraping:** Leverages Selenium with headless Chrome to navigate and extract data from complex, JavaScript-heavy web structures.
+*   **Automated Schema Discovery:** A cloud LLM (via the Groq API) analyzes the page content and automatically suggests the most relevant data columns.
+*   **Consistent Extraction:** A shared *format contract* is built once per run and injected into every parallel chunk prompt, and a final *harmonization* pass rewrites every value to match it — so a price is always `1000`, never `1k$` in one chunk and `1000$` in another. Deterministic normalization (`1k` → `1000`, `1,200 $` → `1200`) catches the rest.
 *   **Structural Analysis:** Analyzes the layout and patterns within HTML to inform the extraction process.
 *   **Python-Based:** Built entirely with Python, ensuring ease of use and integration into existing data science or automation workflows.
 
@@ -21,7 +25,8 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 *   Python 3 (The project is 100% Python)
 *   `pip` (Python package installer)
-*   A Chrome browser (required for the included `chromedriver.exe`)
+*   A Chrome browser
+*   A Groq API key (free at [console.groq.com](https://console.groq.com))
 
 ### Installation
 
@@ -37,18 +42,35 @@ Follow these instructions to get a copy of the project up and running on your lo
     pip install -r requirements.txt
     ```
 
-3.  **ChromeDriver**
-    The repository includes a `chromedriver.exe` file. Ensure this driver is compatible with your installed version of the Chrome browser. If you encounter issues, you may need to download the correct version from the [official ChromeDriver site](https://chromedriver.chromium.org/).
+3.  **Configure the Groq API key**
+    ```bash
+    cp .env.example .env
+    ```
+    Then edit `.env` and set `GROQ_API_KEY` to your key from [console.groq.com](https://console.groq.com). You can optionally override `GROQ_MODEL` (defaults to `llama-3.3-70b-versatile`). If no key is configured, the app lets you paste one into the sidebar at runtime.
+
+4.  **ChromeDriver (usually nothing to do)**
+    Modern Selenium (>= 4.6) includes Selenium Manager, which automatically resolves the correct driver for your installed Chrome — no manual setup needed. The bundled `chromedriver.exe` is kept in the repository only as a fallback for older setups.
 
 ## Usage
 
-The project is structured into several core Python scripts. While the exact user interface is not detailed in the repository, the primary logic is contained within these files:
+Run the Streamlit app:
 
-*   `main.py`: Likely the main entry point for running the framework.
-*   `scrape.py`: Handles the core web scraping functionality.
-*   `parse.py`: Responsible for parsing scraped HTML and performing schema discovery.
+```bash
+streamlit run main.py
+```
 
-A typical workflow might involve running `main.py` with a target URL. Refer to the comments within the scripts for more specific details on their functions and parameters.
+A typical workflow:
+
+1.  **Enter a URL** and (optionally) set **Pages to scrape** in the sidebar to follow pagination.
+2.  **Step 1: Scrape Site** — scrapes the page(s) and suggests columns.
+3.  **Step 2: Select Columns** — keep or trim the suggested columns, add extra instructions (e.g. "Translate to English").
+4.  **Step 3: Generate Structured Table** — extracts the data in parallel, normalizes and harmonizes it, and shows the result as a table with a CSV download.
+
+The project is structured into several core Python scripts:
+
+*   `main.py`: The Streamlit user interface (entry point).
+*   `scrape.py`: Selenium-based scraping, pagination detection, and DOM cleaning/chunking.
+*   `parse.py`: Groq-powered column suggestion, contract-based parallel extraction, deterministic normalization, and table harmonization.
 
 ## Contributing
 
