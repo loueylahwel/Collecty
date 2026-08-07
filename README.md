@@ -1,5 +1,7 @@
 # Collecty
 
+![demo](docs/demo.gif)
+
 An Intelligent, Agentic Web Scraping Framework for Automated Schema Discovery and Structural Analysis.
 
 ## About
